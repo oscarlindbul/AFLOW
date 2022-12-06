@@ -12,7 +12,8 @@ class XtalFinder:
             return subprocess.check_output(
                 self.aflow_executable + cmd,
                 shell=True,
-                                input=input
+                universal_newlines=True,
+                input=input
             )
         except subprocess.CalledProcessError:
             raise OSError('aflow executable not found: ' + self.aflow_executable)
@@ -21,14 +22,14 @@ class XtalFinder:
     def check_path(self, path):
         if type(path) == str:
             if os.path.exists(path):
-                return os.path.realpath(path)
+                return os.path.realpath(path).replace(" ","\\ ")
             else:
                 raise OSError(filename + ' not found')
         elif type(path) == list:
             for p in path:
                 if not os.path.exists(p):
-                    raise OSError(path + ' not found')
-            return ','.join(path)
+                    raise OSError(p + ' not found')
+            return ','.join(list(map(os.path.realpath, path))).replace(" ","\\ ")
         else:
             raise TypeError('The path to input file/files/directory must be a string or a list.')
 
@@ -108,7 +109,7 @@ class XtalFinder:
         res_json = json.loads(output)
         return res_json
     
-    def compare_structure_strings(self, *strings, options=None):
+    def compare_structures_string(self, *strings, options=None):
         command = ' --compare_structures'
         output = ''
 
@@ -116,7 +117,7 @@ class XtalFinder:
         for s in strings:
             total_string += "[VASP_POSCAR_MODE_EXPLICIT]START\n"
             total_string += s
-            total_string += "[VASP_POSCAR_MODE_EXPLICIT]END\n"
+            total_string += "[VASP_POSCAR_MODE_EXPLICIT]STOP\n"
 
         if options:
             command += ' ' + options
@@ -155,6 +156,7 @@ class XtalFinder:
         output = self.aflow_command(
             command + ' --print=json --screen_only --quiet'
         )
+        print(output)
 
         res_json = json.loads(output)
         return res_json

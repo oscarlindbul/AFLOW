@@ -1823,11 +1823,10 @@ void XtalFinderCalculator::loadStructuresFromStringstream(
 
   // ---------------------------------------------------------------------------
   // used to find the total number of structures
-  vector<string> start_string;
-  aurostd::substring2strings(input_stream.str(),start_string,START);
-
-  message << "Loading " << start_string.size() << " structures in file ... ";
-  pflow::logger(_AFLOW_FILE_NAME_, function_name, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+  // OSCAR: WRONG!!!! Will give a vector of newlines, which are not counted correctly....
+  // Use structure_count instead
+  //vector<string> start_string;
+  //aurostd::substring2strings(input_stream.str(),start_string,START);
 
   // parse all lines
   vector<string> structure_lines;
@@ -1849,12 +1848,15 @@ void XtalFinderCalculator::loadStructuresFromStringstream(
     }
   }
   if(LDEBUG){cerr << __AFLOW_FUNC__ << " structure_count=" << structure_count << endl;}
+  
+  message << "Loading " << structure_count << " structures in file ...";
+  pflow::logger(_AFLOW_FILE_NAME_, function_name, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
 
   uint relaxation_step = 0;
   for(uint i=0;i<structure_lines.size();i++){
     if(LDEBUG) {cerr << "compare:: loading " << i << "/" << structure_lines.size() << endl;}
 
-    stringstream designation; designation << "file structure # " << i+1 << "/" << start_string.size();  //CO20211118 - otherwise last structure is 81/82
+    stringstream designation; designation << "file structure # " << i+1 << "/" << structure_count;  //CO20211118 - otherwise last structure is 81/82
     xstructure xstr;
     compare::generateStructure("input geometry", structure_lines[i], relaxation_step, xstr, *p_oss);
 

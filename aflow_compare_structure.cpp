@@ -265,7 +265,7 @@ namespace compare {
       }
       // structure-type comparisons
       else if(vpflow.flag("COMPARE_STRUCTURE")){
-        usage="aflow --compare_structures=str1,str2,str3,... | aflow --compare_structures -D <dir_path> | aflow --compare_structures -F=<filename>";
+        usage="aflow --compare_structures=str1,str2,str3,... | aflow --compare_structures -D <dir_path> | aflow --compare_structures -F=<filename> | aflow --compare_structure -S=<string>";
       }
       vector<string> options, options_general;
       aurostd::string2tokens(GENERAL_XTALFINDER_OPTIONS_LIST,options_general," ");
