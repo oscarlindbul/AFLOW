@@ -7,11 +7,12 @@ class XtalFinder:
     def __init__(self, aflow_executable='aflow'):
         self.aflow_executable = aflow_executable
 
-    def aflow_command(self, cmd):
+    def aflow_command(self, cmd, input=None):
         try:
             return subprocess.check_output(
                 self.aflow_executable + cmd,
-                shell=True
+                shell=True,
+                                input=input
             )
         except subprocess.CalledProcessError:
             raise OSError('aflow executable not found: ' + self.aflow_executable)
@@ -102,6 +103,27 @@ class XtalFinder:
 
         output = self.aflow_command(
             command + ' --print=json --screen_only --quiet'
+        )
+
+        res_json = json.loads(output)
+        return res_json
+    
+    def compare_structure_strings(self, *strings, options=None):
+        command = ' --compare_structures'
+        output = ''
+
+        total_string = ""
+        for s in strings:
+            total_string += "[VASP_POSCAR_MODE_EXPLICIT]START\n"
+            total_string += s
+            total_string += "[VASP_POSCAR_MODE_EXPLICIT]END\n"
+
+        if options:
+            command += ' ' + options
+
+        output = self.aflow_command(
+            command + ' --print=json --screen_only --quiet',
+            input=total_string
         )
 
         res_json = json.loads(output)
